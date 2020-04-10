@@ -1,0 +1,16 @@
+{
+  "name": "node_six_testing",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app/index.js",
+  "scripts": {
+    "start": "node app/index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dd-trace": "0.13.2",
+    "express": "4.17.1",
+    "bunyan": "1.8.5"
+  }
+}
