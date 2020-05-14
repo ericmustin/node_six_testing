@@ -33,12 +33,20 @@ docker run -d --name datadog-agent \
 - Finally, start your application container on the same network as the agent is running on. In the Dockerfile for this application you'll notice we've enabled pointed the Node Tracer to send traces to our agent running in the container `datadog-agent` (ENV DD_AGENT_HOST=datadog-agent) 
 
 ```console
-docker run -p 3000:3000 --name=node_six_testing --network nodetesting --rm --detach node_six_testing:latest
+docker run -d -p 3000:3000 --name=node_six_testing -v $(pwd)/app/:/usr/src/app/app --network nodetesting node_six_testing:latest
 ```
+
+- changes made to your `/app` folder will be mounted onto the container and the app will be automatically restarted
 
 #### Testing
 
 - `curl -G localhost:3000?name=testname`
+
+- `curl -G localhost:3000/one?name=testname`
+
+- `curl -G localhost:3000/two?name=testname`
+
+- `curl -G localhost:3000/three?name=testname`
 
 - `docker exec -it node_six_testing /bin/bash`
 

@@ -33,14 +33,6 @@ const logger = bunyan.createLogger({
   ]
 })
 
-app.get('*', exampleOne)
-app.get('/one', exampleOne)
-app.get('/two', exampleTwo)
-app.get('/three', exampleThree)
-
-app.listen(port, function() {
-  console.log(`listening on port ${port}!`)
-})
 
 function randomIntFromInterval(min, max) { // min and max included 
   return Math.floor(Math.random() * (max - min + 1) + min);
@@ -102,7 +94,7 @@ var exampleThree = async function(req, res) {
   }
 
   let specialDiscount = 0
-
+  // Example using async await
   await axios.get('https://www.google.com')
   console.log('handling response')
   specialDiscount = 50
@@ -112,3 +104,14 @@ var exampleThree = async function(req, res) {
   responseMsg = 'Original ' + "Price: " + checkoutPrice + `, Your Price: ${checkoutPrice - discount - specialDiscount}`
   res.status(200).send(responseMsg)
 }
+
+
+
+app.get('/', exampleOne)
+app.get('/one', exampleOne)
+app.get('/two', exampleTwo)
+app.get('/three', exampleThree)
+
+app.listen(port, function() {
+  console.log(`listening on port ${port}!`)
+})
