@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "dd-trace": "0.13.2",
+    "dd-trace": "0.20.3",
     "express": "4.17.1",
     "bunyan": "1.8.5"
   }

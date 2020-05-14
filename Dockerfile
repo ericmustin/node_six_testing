@@ -1,4 +1,4 @@
-FROM node:6
+FROM node:12
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -16,6 +16,8 @@ RUN npm install
 # Bundle app source
 COPY . .
 
+ENV DD_AGENT_HOST=datadog-agent
+ENV DD_TRACE_AGENT_PORT=8126
 
 EXPOSE 3000
 
