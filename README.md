@@ -63,3 +63,4 @@ $ `docker logs node_six_testing | ./node_modules/.bin/bunyan`
   - `docker rm node_six_testing`
   - `docker stop datadog-agent`
   - `docker rm datadog-agent`
+  - `docker network rm nodetesting`
