@@ -9,8 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^0.19.2",
+    "bunyan": "1.8.5",
     "dd-trace": "0.20.3",
-    "express": "4.17.1",
-    "bunyan": "1.8.5"
+    "express": "4.17.1"
   }
 }
