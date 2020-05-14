@@ -1,7 +1,20 @@
 const tracer = require('dd-trace').init({
-	env: 'node-hooks',
-	analytics: true,
-  logInjection: true
+	env: 'node-hooks'
+})
+
+tracer.use('express', {
+  hooks: {
+    request: (span, req, res) => {
+    console.log('express hook invoked')
+      // span.setTag('hook_tag_key', 'hook_tag_value')
+      
+      // logger.info(span.context())
+
+      // logger.info(span.context()._tags)
+
+      // logger.info(span.context()._trace.started[0].context())
+  }
+  }
 })
 
 const bunyan = require('bunyan');
@@ -14,7 +27,7 @@ const logger = bunyan.createLogger({
   streams: [
     {
       level: 'debug',
-      path: 'testLog'
+      stream: process.stdout
     }
   ]
 })
@@ -27,16 +40,10 @@ app.get('*', function(req, res) {
     discount = 5  
   }
 
-  const thankYou = `
-  Hello ${req.query && req.query.name}, 
-  thanks for shopping today! You order total today was: $${checkoutPrice - discount}. 
-  You saved ${discount} dollars. Come back real soon!
-  \n
-  ` 
+  logger.info({event: checkoutPrice - discount}, 'Received incoming request ...test')
 
-  logger.info({event: thankYou}, 'Received incoming request ...test')
-
-  res.status(200).send(thankYou)
+  responseMsg = 'Original ' + "Price: " + checkoutPrice + `, Your Price: ${checkoutPrice - discount}`
+  res.status(200).send(responseMsg)
 })
 
 app.listen(port, function() {

@@ -1,8 +1,40 @@
 #### Setup
 
-- `docker build -t node_six_testing .`
+- From directory root
 
-- `docker run -p 3000:3000 --name=node_six_testing --detach node_six_testing:latest`
+```console
+docker build -t node_six_testing .
+```
+
+- Next, create a docker network
+
+```console
+docker network create nodetesting
+```
+
+- Then, start the datadog container agent. Be sure to replace the below <YOUR_API_KEY> with your Datadog API Key. You'll notice we have the datadog-agent running on the network we just created
+
+```console
+# Datadog Agent
+docker run -d --name datadog-agent \
+              --network nodetesting \
+              -v /var/run/docker.sock:/var/run/docker.sock:ro \
+              -v /proc/:/host/proc/:ro \
+              -v /sys/fs/cgroup/:/host/sys/fs/cgroup:ro \
+              -e DD_API_KEY=<YOUR_API_KEY> \
+              -e DD_APM_ENABLED=true \
+              -e DD_APM_NON_LOCAL_TRAFFIC=true \
+              -e DD_LOGS_ENABLED=true \
+              -e DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true \
+              -e DD_AC_EXCLUDE="name:datadog-agent" \
+              datadog/agent:latest
+```
+
+- Finally, start your application container on the same network as the agent is running on. In the Dockerfile for this application you'll notice we've enabled pointed the Node Tracer to send traces to our agent running in the container `datadog-agent` (ENV DD_AGENT_HOST=datadog-agent) 
+
+```console
+docker run -p 3000:3000 --name=node_six_testing --network nodetesting --rm --detach node_six_testing:latest
+```
 
 #### Testing
 
@@ -10,12 +42,16 @@
 
 - `docker exec -it node_six_testing /bin/bash`
 
-(From inside docker container)
-```
-root@937c15076cd0:/usr/src/app# cat testLog 
+- To view logs
 
-{"name":"testLog","hostname":"937c15076cd0","pid":17,"level":30,"event":"\n  Hello \"Cecile\", \n  thanks for shopping today! You order total today was: $86. \n  You saved 5 dollars. Come back real soon!\n  \n\n  ","msg":"Received incoming request ...test","time":"2020-04-10T10:26:29.084Z","v":0,"dd":{"trace_id":"2788779339466193134","span_id":"6572389213715558827"}}
+```console
+$ npm install
+
+$ `docker logs node_six_testing | ./node_modules/.bin/bunyan`
 ```
 
-From cli
-- `docker stop node_six_testing`
+-  cleanup
+  - `docker stop node_six_testing`
+  - `docker rm node_six_testing`
+  - `docker stop datadog-agent`
+  - `docker rm datadog-agent`
