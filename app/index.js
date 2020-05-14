@@ -19,6 +19,7 @@ tracer.use('express', {
 
 const bunyan = require('bunyan');
 const express = require('express')
+const axios = require('axios');
 const app = express()
 const port = 3000
 
@@ -32,7 +33,12 @@ const logger = bunyan.createLogger({
   ]
 })
 
-app.get('*', function(req, res) {
+
+function randomIntFromInterval(min, max) { // min and max included 
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+var exampleOne = function(req, res) {
   const checkoutPrice = randomIntFromInterval(10, 100)
   let discount = 0
 
@@ -40,17 +46,72 @@ app.get('*', function(req, res) {
     discount = 5  
   }
 
-  logger.info({event: checkoutPrice - discount}, 'Received incoming request ...test')
+  let specialDiscount = 0
+  // Make a request for a user with a given ID
+  axios.get('https://www.google.com')
+    .then(function (response) {
+      // handle success
+      console.log('handling response')
+      specialDiscount = 50
+    })
 
-  responseMsg = 'Original ' + "Price: " + checkoutPrice + `, Your Price: ${checkoutPrice - discount}`
+  logger.info({event: checkoutPrice - discount - specialDiscount}, 'Received incoming request ...test')
+
+  responseMsg = 'Original ' + "Price: " + checkoutPrice + `, Your Price: ${checkoutPrice - discount - specialDiscount}`
   res.status(200).send(responseMsg)
-})
+}
+
+
+var exampleTwo = function(req, res) {
+  const checkoutPrice = randomIntFromInterval(10, 100)
+  let discount = 0
+
+  if (checkoutPrice > 50) {
+    discount = 5  
+  }
+
+  let specialDiscount = 0
+  // Example using .then callback
+  axios.get('https://www.google.com').then(function (response) {
+    // handle success
+    console.log('handling response')
+    specialDiscount = 50
+
+    logger.info({event: checkoutPrice - discount - specialDiscount}, 'Received incoming request ...test')
+
+    responseMsg = 'Original ' + "Price: " + checkoutPrice + `, Your Price: ${checkoutPrice - discount - specialDiscount}`
+    res.status(200).send(responseMsg)
+  }) 
+}
+
+
+var exampleThree = async function(req, res) {
+  const checkoutPrice = randomIntFromInterval(10, 100)
+  let discount = 0
+
+  if (checkoutPrice > 50) {
+    discount = 5  
+  }
+
+  let specialDiscount = 0
+  // Example using async await
+  await axios.get('https://www.google.com')
+  console.log('handling response')
+  specialDiscount = 50
+
+  logger.info({event: checkoutPrice - discount - specialDiscount}, 'Received incoming request ...test')
+
+  responseMsg = 'Original ' + "Price: " + checkoutPrice + `, Your Price: ${checkoutPrice - discount - specialDiscount}`
+  res.status(200).send(responseMsg)
+}
+
+
+
+app.get('/', exampleOne)
+app.get('/one', exampleOne)
+app.get('/two', exampleTwo)
+app.get('/three', exampleThree)
 
 app.listen(port, function() {
   console.log(`listening on port ${port}!`)
 })
-
-
-function randomIntFromInterval(min, max) { // min and max included 
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
